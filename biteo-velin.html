@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Biteo">
+<meta name="theme-color" content="#133D31">
+<title>Biteo – velín</title>
+<style>
+  :root{
+    --green:#1F5F4B; --greenDk:#133D31; --greenLt:#2E7D5B; --cream:#F5F1E8;
+    --card:#FFFFFF; --ink:#16241E; --sub:#5C6B63; --line:#E6E1D4;
+    --amber:#BE7A1B; --red:#B4452F; --blue:#3E6E8E;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{background:var(--cream);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px}
+  input,select,button{font-family:inherit;font-size:15px}
+  .app{display:flex;min-height:100vh}
+  /* sidebar */
+  aside{background:var(--greenDk);width:230px;flex-shrink:0;padding:16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+  .logo{display:flex;align-items:center;gap:10px;padding:12px 8px 16px}
+  .logo .b{width:38px;height:38px;border-radius:12px;background:var(--cream);color:var(--greenDk);display:grid;place-items:center;font-weight:800;font-size:20px}
+  .logo .t{color:var(--cream);font-weight:700;line-height:1.1}
+  .logo .s{color:#9DB6AB;font-size:11px}
+  .navbtn{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;color:#C7D6CE;background:none;border:none;cursor:pointer;text-align:left;font-weight:500;width:100%}
+  .navbtn.on{background:var(--green);color:#fff}
+  .navbtn .badge{margin-left:auto;background:var(--amber);color:#fff;font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px}
+  .foot{margin-top:auto;color:#7E988C;font-size:11px;padding:12px 8px}
+  /* bottom nav mobile */
+  .bottomnav{display:none}
+  main{flex:1;padding:28px;max-width:1100px;width:100%;margin:0 auto}
+  h1{font-size:24px;font-weight:800;margin:0}
+  .sub{color:var(--sub);font-size:14px}
+  .head{margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .grid{display:grid;gap:12px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .stat{flex:1;min-width:150px}
+  .stat .l{color:var(--sub);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  .stat .v{font-size:24px;font-weight:800;margin-top:4px}
+  .stat .x{color:var(--sub);font-size:12px;margin-top:4px}
+  .pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap;display:inline-block}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;font-weight:700;border:none;cursor:pointer;background:var(--green);color:#fff;font-size:14px}
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--sub)}
+  .btn.danger{background:none;color:var(--red)}
+  .btn:disabled{background:var(--line);cursor:default}
+  .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+  .bar>i{display:block;height:100%;border-radius:99px}
+  label{color:var(--sub);font-size:12px;font-weight:600;display:block;margin-bottom:4px}
+  .in{width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--line);color:var(--ink);outline:none;background:#fff}
+  .in.bold{font-weight:700}
+  .link{color:var(--green);font-weight:600;background:none;border:none;cursor:pointer;font-size:14px;padding:0;margin-bottom:12px}
+  .fcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:left;cursor:pointer;width:100%}
+  .muted{color:var(--sub)}
+  .chip{padding:8px 12px;border-radius:12px;font-weight:600;font-size:14px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+  .chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+  .sync{display:inline-flex;align-items:center;gap:6px;background:rgba(62,110,142,.1);color:var(--blue);font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px}
+  /* simple bar chart */
+  .chart{display:flex;align-items:flex-end;gap:6px;height:170px;padding-top:8px}
+  .chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+  .chart .col i{width:100%;max-width:26px;border-radius:5px 5px 0 0;display:block}
+  .chart .col span{font-size:10px;color:var(--sub)}
+  .hbar{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px}
+  .hbar .nm{width:84px;flex-shrink:0;color:var(--sub)}
+  .hbar .tk{flex:1;height:18px;background:var(--line);border-radius:6px;overflow:hidden}
+  .hbar .tk>i{display:block;height:100%;border-radius:6px}
+  .hbar .vl{width:64px;text-align:right;font-weight:700}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:var(--greenDk);color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:60}
+  svg.ic{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  @media (max-width:820px){
+    aside{display:none}
+    main{padding:16px;padding-bottom:84px}
+    .g3{grid-template-columns:1fr}
+    .g2{grid-template-columns:1fr}
+    .bottomnav{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--greenDk);z-index:40;overflow-x:auto;padding-bottom:env(safe-area-inset-bottom)}
+    .bottomnav button{flex:1;min-width:58px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;background:none;border:none;color:#9DB6AB;cursor:pointer}
+    .bottomnav button.on{color:#fff}
+    .bottomnav button span{font-size:9px;white-space:nowrap}
+    .bottomnav .badge{position:absolute;top:2px;margin-left:18px;background:var(--amber);color:#fff;font-size:8px;font-weight:700;padding:0 5px;border-radius:99px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar"></aside>
+  <main id="main"></main>
+</div>
+<div class="bottomnav" id="bottomnav"></div>
+
+<script>
+/* ================= data ================= */
+var C={green:"#1F5F4B",greenDk:"#133D31",greenLt:"#2E7D5B",cream:"#F5F1E8",card:"#fff",ink:"#16241E",sub:"#5C6B63",line:"#E6E1D4",amber:"#BE7A1B",red:"#B4452F",blue:"#3E6E8E"};
+var CAT_EMOJI={"Jídlo":"🍱","Pití":"🥤","Svačina":"🥪","Snack":"🍫"};
+var CATS=Object.keys(CAT_EMOJI);
+var MONTHS=["led","úno","bře","dub","kvě","čen","čec","srp","zář","říj","lis","pro"];
+function fmt(n){return new Intl.NumberFormat("cs-CZ").format(Math.round(n));}
+function ago(d){var x=new Date();x.setDate(x.getDate()-d);return x.toISOString().slice(0,10);}
+function daysSince(iso){return Math.floor((Date.now()-new Date(iso).getTime())/86400000);}
+
+var DEFAULT_SETTINGS={marze:40,polozekNakup:1.5,plytvani:0.15,poplatek:5000,fix:10000,ostatni:3000,dan:0.21,dny:26};
+var DEFAULT_CATALOG=[
+ {id:1,name:"Teplé jídlo – guláš",cat:"Jídlo",img:null,trvanlivost:3,nakup:69,prodej:129,dph:12},
+ {id:2,name:"Velký salát s proteinem",cat:"Jídlo",img:null,trvanlivost:2,nakup:58,prodej:109,dph:12},
+ {id:3,name:"Bageta / sendvič",cat:"Jídlo",img:null,trvanlivost:5,nakup:36,prodej:79,dph:12},
+ {id:4,name:"Wrap / tortilla",cat:"Jídlo",img:null,trvanlivost:4,nakup:42,prodej:89,dph:12},
+ {id:5,name:"Energetický nápoj",cat:"Pití",img:null,trvanlivost:270,nakup:22,prodej:49,dph:21},
+ {id:6,name:"Voda 0,5 l",cat:"Pití",img:null,trvanlivost:365,nakup:10,prodej:27,dph:12},
+ {id:7,name:"Ledová káva",cat:"Pití",img:null,trvanlivost:30,nakup:21,prodej:45,dph:12},
+ {id:8,name:"Jogurt / skyr",cat:"Svačina",img:null,trvanlivost:14,nakup:16,prodej:39,dph:12},
+ {id:9,name:"Proteinová tyčinka",cat:"Snack",img:null,trvanlivost:180,nakup:23,prodej:49,dph:21},
+ {id:10,name:"Oříšky / směs",cat:"Snack",img:null,trvanlivost:120,nakup:24,prodej:52,dph:12}
+];
+var DEFAULT_FRIDGES=[
+ {id:1,name:"Firma Kružík (pilot)",city:"Kroměříž",route:"KM-město",lide:100,pen:0.14,status:"aktivní"},
+ {id:2,name:"Magneton a.s.",city:"Kroměříž",route:"KM-průmysl",lide:300,pen:0.16,status:"aktivní"},
+ {id:3,name:"PLASTIKA a.s.",city:"Kroměříž",route:"KM-průmysl",lide:250,pen:0.13,status:"aktivní"},
+ {id:4,name:"Kroměřížská nemocnice",city:"Kroměříž",route:"KM-město",lide:300,pen:0.18,status:"aktivní"},
+ {id:5,name:"TOSHULIN a.s.",city:"Hulín",route:"KM-průmysl",lide:550,pen:0.12,status:"zvažuji"}
+];
+var STOCK={
+ 1:[{pid:1,qty:2,max:10,r:ago(2)},{pid:3,qty:4,max:12,r:ago(3)},{pid:5,qty:9,max:20,r:ago(1)},{pid:6,qty:14,max:24,r:ago(1)},{pid:9,qty:6,max:18,r:ago(5)},{pid:8,qty:3,max:12,r:ago(1)}],
+ 2:[{pid:1,qty:1,max:14,r:ago(2)},{pid:5,qty:5,max:24,r:ago(1)},{pid:7,qty:2,max:16,r:ago(2)},{pid:3,qty:8,max:16,r:ago(1)}],
+ 3:[{pid:6,qty:20,max:24,r:ago(1)},{pid:4,qty:6,max:14,r:ago(1)},{pid:5,qty:11,max:20,r:ago(1)}],
+ 4:[{pid:2,qty:3,max:12,r:ago(1)},{pid:7,qty:9,max:18,r:ago(1)},{pid:3,qty:5,max:16,r:ago(1)},{pid:6,qty:16,max:24,r:ago(1)}],
+ 5:[]
+};
+
+/* persistence */
+function load(k,def){try{var v=localStorage.getItem("biteo_"+k);return v?JSON.parse(v):def;}catch(e){return def;}}
+function save(k,v){try{localStorage.setItem("biteo_"+k,JSON.stringify(v));}catch(e){}}
+var S=load("settings",DEFAULT_SETTINGS);
+var CATALOG=load("catalog",DEFAULT_CATALOG);
+var FRIDGES=load("fridges",DEFAULT_FRIDGES);
+
+/* ================= logic ================= */
+function finance(p){
+ var npd=Math.round(p.lide*p.pen), npm=npd*p.dny;
+ var hruba=npm*p.marze*p.polozekNakup, poply=hruba*(1-p.plytvani);
+ var pred=poply+p.poplatek-p.fix-p.ostatni, dan=pred>0?pred*p.dan:0, net=pred-dan;
+ var be=(p.fix+p.ostatni-p.poplatek)<=0?0:((p.fix+p.ostatni-p.poplatek)/((1-p.plytvani)*p.marze*p.polozekNakup))/p.dny;
+ return {npd:npd,net:net,pred:pred,be:be,rez:npd-be};
+}
+function ff(f){if(f.status!=="aktivní")return null;var o={};for(var k in S)o[k]=S[k];o.lide=f.lide;o.pen=f.pen;return finance(o);}
+function verdict(net){return net>=40000?{t:"A – jednoznačně",c:C.green}:net>=15000?{t:"B – ano",c:C.green}:net>=3000?{t:"C – jen na trase",c:C.amber}:net>0?{t:"D – hraniční",c:C.amber}:{t:"NE – ztráta",c:C.red};}
+function prodMap(){var m={};CATALOG.forEach(function(p){m[p.id]=p;});return m;}
+function alerts(){
+ var P=prodMap(),out=[];
+ FRIDGES.filter(function(f){return f.status==="aktivní";}).forEach(function(f){
+  (STOCK[f.id]||[]).forEach(function(it){var p=P[it.pid];if(!p)return;var left=p.trvanlivost-daysSince(it.r);
+   if(it.qty/it.max<=0.3)out.push({fid:f.id,type:"stock",fridge:f.name,route:f.route,city:f.city,item:p.name,qty:it.qty});
+   if(left<=1)out.push({fid:f.id,type:"exp",fridge:f.name,route:f.route,city:f.city,item:p.name,left:left});});
+ });
+ return out;
+}
+
+/* ================= icons ================= */
+var IC={
+ dashboard:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+ fridge:'<rect x="5" y="2" width="14" height="20" rx="2"/><line x1="5" y1="10" x2="19" y2="10"/><line x1="8" y1="6" x2="8" y2="6.01"/>',
+ truck:'<rect x="1" y="6" width="13" height="10" rx="1"/><path d="M14 9h4l3 3v4h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
+ tag:'<path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1"/>',
+ settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/>',
+ compass:'<circle cx="12" cy="12" r="10"/><polygon points="16 8 10 10 8 16 14 14 16 8"/>',
+ pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+ plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+ check:'<polyline points="20 6 9 17 4 12"/>',
+ trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>',
+ image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+ search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+ copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+ pencil:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+ refresh:'<path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>',
+ trending:'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ package:'<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/>'
+};
+function ic(name,size){return '<svg class="ic" viewBox="0 0 24 24"'+(size?' style="width:'+size+'px;height:'+size+'px"':'')+'>'+(IC[name]||'')+'</svg>';}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function pill(txt,color){return '<span class="pill" style="background:'+color+'1A;color:'+color+'">'+esc(txt)+'</span>';}
+function syncBadge(){return '<span class="sync">'+ic("refresh",12)+'Synced ze Selfly Store · dnes 8:14</span>';}
+
+/* ================= state / nav ================= */
+var state={tab:"prehled",sel:null,sub:null,q:"",cat:"Vše"};
+var NAV=[
+ {id:"prehled",label:"Přehled",icon:"dashboard"},
+ {id:"lednice",label:"Lednice",icon:"fridge"},
+ {id:"trasy",label:"Trasy",icon:"truck"},
+ {id:"misto",label:"Nové místo",icon:"compass"},
+ {id:"sortiment",label:"Sortiment",icon:"tag"},
+ {id:"nastaveni",label:"Nastavení",icon:"settings"}
+];
+function go(tab){state.tab=tab;state.sel=null;state.sub=null;render();}
+function toast(msg){var t=document.createElement("div");t.className="toast";t.innerHTML=ic("check",16)+" "+esc(msg);document.body.appendChild(t);setTimeout(function(){t.remove();},2000);}
+
+/* ================= views ================= */
+function statBox(l,v,x,accent){return '<div class="card stat"><div class="l">'+esc(l)+'</div><div class="v"'+(accent?' style="color:'+accent+'"':'')+'>'+v+'</div>'+(x?'<div class="x">'+esc(x)+'</div>':'')+'</div>';}
+
+function viewPrehled(){
+ var act=FRIDGES.filter(function(f){return f.status==="aktivní";});
+ var total=act.reduce(function(a,f){return a+(ff(f)?ff(f).net:0);},0);
+ var al=alerts(); var restock=new Set(al.map(function(a){return a.fid;})).size;
+ var now=new Date().getMonth();
+ var maxTrend=total*1.08||1;
+ var trend='';
+ for(var i=0;i<6;i++){var m=(now-5+i+12)%12;var val=total*(0.55+i*0.09);var h=Math.max(4,(val/maxTrend)*150);
+  trend+='<div class="col"><i style="height:'+h+'px;background:'+C.greenLt+';max-width:34px"></i><span>'+MONTHS[m]+'</span></div>';}
+ var maxF=Math.max.apply(null,act.map(function(f){return ff(f).net;}).concat([1]));
+ var bars=act.map(function(f){var n=ff(f).net;var col=n>=15000?C.green:n>0?C.amber:C.red;
+  return '<div class="hbar"><span class="nm">'+esc(f.name.split(" ")[0])+'</span><div class="tk"><i style="width:'+Math.max(2,(n/maxF)*100)+'%;background:'+col+'"></i></div><span class="vl">'+fmt(n/1000)+'k</span></div>';}).join('');
+ var cards=act.map(function(f){var fi=ff(f);var v=verdict(fi.net);
+  return '<button class="fcard" onclick="openFridge('+f.id+')"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><div style="font-weight:700">'+esc(f.name)+'</div><div class="muted" style="font-size:12px;display:flex;align-items:center;gap:4px;margin-top:2px">'+ic("pin",12)+esc(f.city)+' · '+esc(f.route)+'</div></div>'+pill(v.t.split(" ")[0],v.c)+'</div><div style="display:flex;gap:16px;margin-top:12px;font-size:14px"><div><div class="muted" style="font-size:11px">zisk/měs</div><div style="font-weight:700;color:'+C.green+'">'+fmt(fi.net)+' Kč</div></div><div><div class="muted" style="font-size:11px">prodejů/den</div><div style="font-weight:700">'+fi.npd+'</div></div><div><div class="muted" style="font-size:11px">break-even</div><div style="font-weight:700">'+fi.be.toFixed(1)+'/den</div></div></div></button>';}).join('');
+ return '<div class="head"><div><h1>Přehled</h1><div class="sub">Ekonomika celého portfolia</div></div>'+syncBadge()+'</div>'
+  +(restock>0?'<button onclick="go(\'trasy\')" style="width:100%;text-align:left;padding:12px;border-radius:12px;margin-bottom:16px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;cursor:pointer;background:rgba(190,122,27,.1);border:1px solid rgba(190,122,27,.35);color:'+C.amber+'">'+ic("truck",16)+'Selfly hlásí '+al.length+' položek k doplnění na '+restock+' lednicích — naplánovat trasu →</button>':'')
+  +'<div class="row" style="margin-bottom:20px">'+statBox("Aktivní lednice",act.length)+statBox("Čistý zisk / měsíc",fmt(total)+" Kč","po dani, dle modelu",C.green)+statBox("Čistý zisk / rok",fmt(total*12)+" Kč","při dnešním portfoliu")+statBox("Průměr na lednici",fmt(act.length?total/act.length:0)+" Kč","měsíčně")+'</div>'
+  +'<div class="grid g2" style="margin-bottom:12px"><div class="card"><div style="font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px">'+ic("trending",16)+'Vývoj čistého zisku (6 měsíců)</div><div class="chart">'+trend+'</div></div><div class="card"><div style="font-weight:700;margin-bottom:12px">Zisk podle lednice (Kč/měs)</div>'+bars+'</div></div>'
+  +'<div style="font-weight:700;margin:16px 0 8px">Lednice</div><div class="grid g2">'+cards+'</div>';
+}
+
+function viewLednice(){
+ if(state.sub==="add")return viewFridgeForm(null);
+ var cards=FRIDGES.map(function(f){var fi=ff(f);var isA=f.status==="aktivní";
+  return '<button class="fcard" style="opacity:'+(isA?1:.7)+'" onclick="openFridge('+f.id+')"><div style="display:flex;justify-content:space-between;align-items:flex-start">'+ic("fridge",20)+pill(f.status,isA?C.green:C.blue)+'</div><div style="font-weight:700;margin-top:8px">'+esc(f.name)+'</div><div class="muted" style="font-size:12px;display:flex;align-items:center;gap:4px">'+ic("pin",12)+esc(f.city)+' · '+esc(f.route)+'</div><div style="border-top:1px solid '+C.line+';margin-top:12px;padding-top:12px;font-size:14px">'+(isA?'<div style="display:flex;justify-content:space-between"><span class="muted">zisk/měs</span><span style="font-weight:700;color:'+C.green+'">'+fmt(fi.net)+' Kč</span></div>':'<div class="muted" style="font-size:12px">'+f.lide+' zaměstnanců · zvažuji</div>')+'</div></button>';}).join('');
+ return '<div class="head"><div><h1>Lednice</h1><div class="sub">Ekonomika každé lokace</div></div><button class="btn" onclick="state.sub=\'add\';render()">'+ic("plus",16)+'Přidat lednici</button></div><div class="grid g3">'+cards+'</div>';
+}
+
+function viewFridgeForm(f){
+ var e=f||{name:"",city:"",route:"",lide:150,pen:0.13,status:"zvažuji"};
+ window._ff=JSON.parse(JSON.stringify(e));
+ var st=["zvažuji","aktivní"].map(function(x){return '<button class="chip '+(e.status===x?'on':'')+'" onclick="_ff.status=\''+x+'\';render()">'+x+'</button>';}).join('');
+ return '<button class="link" onclick="state.sub=null;render()">← Zpět</button><div class="head"><div><h1>'+(f?'Upravit lednici':'Přidat lednici')+'</h1><div class="sub">Po uložení se rovnou počítá zisk i break-even</div></div></div>'
+  +'<div class="card grid g2" style="max-width:640px">'
+  +'<div style="grid-column:1/-1"><label>Název firmy / místa</label><input class="in" value="'+esc(e.name)+'" oninput="_ff.name=this.value"></div>'
+  +'<div><label>Město</label><input class="in" value="'+esc(e.city)+'" oninput="_ff.city=this.value"></div>'
+  +'<div><label>Trasa (svoz)</label><input class="in" value="'+esc(e.route)+'" oninput="_ff.route=this.value"></div>'
+  +'<div><label>Počet zaměstnanců</label><input class="in bold" type="number" value="'+e.lide+'" oninput="_ff.lide=+this.value||0"></div>'
+  +'<div><label>Odhad % co nakoupí denně</label><input class="in bold" type="number" value="'+Math.round(e.pen*100)+'" oninput="_ff.pen=(+this.value||0)/100"></div>'
+  +'<div style="grid-column:1/-1"><label>Stav</label><div style="display:flex;gap:8px">'+st+'</div></div></div>'
+  +'<div style="display:flex;gap:8px;margin-top:16px"><button class="btn" onclick="saveFridge('+(f?f.id:'null')+')">'+ic("check",16)+'Uložit</button><button class="btn ghost" onclick="state.sub=null;render()">Zrušit</button></div>';
+}
+function saveFridge(id){
+ var e=window._ff;if(!e.name){toast("Vyplň název");return;}
+ if(id){FRIDGES=FRIDGES.map(function(x){return x.id===id?Object.assign({},x,e):x;});}
+ else{e.id=Date.now();FRIDGES.push(e);if(!STOCK[e.id])STOCK[e.id]=[];}
+ save("fridges",FRIDGES);state.sub=null;state.sel=id||e.id;toast("Lednice uložena");render();
+}
+function openFridge(id){state.tab="lednice";state.sel=id;state.sub=null;render();}
+
+function viewDetail(){
+ var f=FRIDGES.filter(function(x){return x.id===state.sel;})[0];if(!f){state.sel=null;return viewLednice();}
+ if(state.sub==="edit")return viewFridgeForm(f);
+ var fi=ff(f),P=prodMap();var v=fi?verdict(fi.net):null;
+ var econ=fi?'<div class="row" style="margin-bottom:12px">'+statBox("Čistý zisk / měsíc",fmt(fi.net)+" Kč",v.t,C.green)+statBox("Prodejů / den",fi.npd)+statBox("Break-even",fi.be.toFixed(1)+"/den","prodat na nulu")+statBox("Rezerva nad BE","+"+fi.rez.toFixed(0)+"/den","polštář",C.green)+'</div>'
+   :'<div class="card" style="margin-bottom:12px"><div style="font-weight:700">Zatím nenasazeno</div><div class="muted" style="font-size:14px">Přepni stav na „aktivní“ (Upravit), až lednici nasadíš.</div></div>';
+ var stock=STOCK[f.id]||[];
+ var rows=stock.length===0?'<div class="muted" style="font-size:14px">Žádná data ze Selfly.</div>':stock.map(function(it){var p=P[it.pid];if(!p)return'';var low=it.qty/it.max<=0.3;var left=p.trvanlivost-daysSince(it.r);var exp=left<=1;
+  var tags=(exp?pill(left<=0?"prošlé":"expirace "+left+" d",C.red):pill("vydrží "+left+" d",C.greenLt))+(low?' '+pill("dochází",C.amber):'');
+  var col=exp?C.red:low?C.amber:C.greenLt;
+  return '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px"><span>'+CAT_EMOJI[p.cat]+' '+esc(p.name)+' '+tags+'</span><span class="muted" style="font-size:12px">'+it.qty+'/'+it.max+'</span></div><div class="bar"><i style="width:'+Math.min(100,(it.qty/it.max)*100)+'%;background:'+col+'"></i></div></div>';}).join('');
+ return '<button class="link" onclick="state.sel=null;render()">← Zpět na lednice</button>'
+  +'<div class="head"><div><h1>'+esc(f.name)+'</h1><div class="sub" style="display:flex;align-items:center;gap:4px">'+ic("pin",13)+esc(f.city)+' · trasa '+esc(f.route)+' · '+f.lide+' zaměstnanců</div></div><div style="display:flex;gap:8px;align-items:center">'+pill(f.status,f.status==="aktivní"?C.green:C.blue)+'<button class="btn ghost" onclick="state.sub=\'edit\';render()">'+ic("pencil",16)+'Upravit</button></div></div>'
+  +econ
+  +'<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px"><div style="font-weight:700;display:flex;align-items:center;gap:8px">'+ic("package",16)+'Stav zásob a trvanlivost</div>'+syncBadge()+'</div><div class="muted" style="font-size:12px;margin-bottom:12px">Zásoby, doplňování a expiraci spravuje Selfly Store. Tady je vidíš jen pro přehled.</div>'+rows+'</div>';
+}
+
+function viewTrasy(){
+ var act=FRIDGES.filter(function(f){return f.status==="aktivní";});
+ var al=alerts();var routes={};
+ act.forEach(function(f){var r=routes[f.route]=routes[f.route]||{fridges:[],net:0,needs:{}};r.fridges.push(f);r.net+=ff(f)?ff(f).net:0;});
+ al.forEach(function(a){if(routes[a.route]){(routes[a.route].needs[a.fid]=routes[a.route].needs[a.fid]||{items:[]}).items.push(a);}});
+ var html='<div class="head"><div><h1>Trasy</h1><div class="sub">Plánování svozu a ekonomika podle trasy</div></div>'+syncBadge()+'</div><div class="muted" style="font-size:14px;margin-bottom:16px">Lednice po svozové trase — vidíš, kolik trasa vydělává a co na ní Selfly hlásí. Cíl: jezdit v hroznech.</div>';
+ Object.keys(routes).forEach(function(route){var r=routes[route];var need=Object.keys(r.needs).length;
+  var inner=r.fridges.map(function(f){var nd=r.needs[f.id];
+   var items=nd?nd.items.map(function(n){return '<div style="display:flex;align-items:center;gap:8px;font-size:12px">'+(n.type==="exp"?pill("stáhnout",C.red):pill("doplnit",C.amber))+'<span>'+esc(n.item)+'</span><span class="muted">'+(n.type==="exp"?(n.left<=0?"prošlé":"expiruje za "+n.left+" d"):"zbývá "+n.qty+" ks")+'</span></div>';}).join(''):'<div class="muted" style="font-size:12px;margin-top:4px">Dnes není co doplnit.</div>';
+   return '<div style="background:'+C.cream+';border-radius:10px;padding:12px"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px"><span style="font-weight:700;font-size:14px;display:flex;align-items:center;gap:4px">'+ic("pin",12)+esc(f.name)+'</span><span style="font-size:14px;color:'+C.green+'">'+fmt(ff(f).net)+' Kč/měs</span></div><div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">'+items+'</div></div>';}).join('');
+  html+='<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px"><div style="display:flex;align-items:center;gap:8px">'+ic("truck",18)+'<span style="font-weight:800;font-size:18px">Trasa '+esc(route)+'</span></div><div style="display:flex;gap:16px;font-size:14px"><div style="text-align:right"><div class="muted" style="font-size:11px">lednic</div><div style="font-weight:700">'+r.fridges.length+'</div></div><div style="text-align:right"><div class="muted" style="font-size:11px">zisk/měs</div><div style="font-weight:700;color:'+C.green+'">'+fmt(r.net)+' Kč</div></div><div style="text-align:right"><div class="muted" style="font-size:11px">doplnit</div><div style="font-weight:700;color:'+(need?C.amber:C.green)+'">'+(need||"—")+'</div></div></div></div><div style="display:flex;flex-direction:column;gap:8px">'+inner+'</div></div>';
+ });
+ return html;
+}
+
+function viewMisto(){
+ if(!window._m)window._m={lide:200,pol:1.5,a:8,b:13,c:20};
+ var m=window._m;
+ function calc(pen){var o={};for(var k in S)o[k]=S[k];o.lide=m.lide;o.pen=pen/100;o.polozekNakup=m.pol;return finance(o).net;}
+ var scen=[["Opatrný",m.a],["Střední",m.b],["Optimistický",m.c]].map(function(x){var net=calc(x[1]);var v=verdict(net);
+  return '<div class="card"><div class="muted" style="font-size:12px;font-weight:600;text-transform:uppercase">'+x[0]+'</div><div class="muted" style="font-size:12px;margin-bottom:8px">'+x[1]+' % nakoupí</div><div style="font-size:24px;font-weight:800;color:'+(net>0?C.green:C.red)+'">'+fmt(net)+' Kč</div><div class="muted" style="font-size:12px;margin-bottom:8px">čistý zisk / měsíc</div><div style="text-align:center;font-weight:700;padding:6px 12px;border-radius:9px;background:'+v.c+'1A;color:'+v.c+'">'+v.t+'</div></div>';}).join('');
+ return '<div class="head"><div><h1>Nové místo</h1><div class="sub">Posuď firmu — opatrný / střední / optimistický scénář</div></div></div>'
+  +'<div class="card grid g2" style="max-width:640px;margin-bottom:16px">'
+  +'<div><label>Počet zaměstnanců</label><input class="in bold" type="number" value="'+m.lide+'" oninput="_m.lide=+this.value||0;render()"></div>'
+  +'<div><label>Položek na nákup</label><input class="in bold" type="number" step="0.1" value="'+m.pol+'" oninput="_m.pol=+this.value||0;render()"></div>'
+  +'<div><label>% nakoupí – opatrný</label><input class="in" type="number" value="'+m.a+'" oninput="_m.a=+this.value||0;render()"></div>'
+  +'<div><label>% nakoupí – střední</label><input class="in" type="number" value="'+m.b+'" oninput="_m.b=+this.value||0;render()"></div>'
+  +'<div><label>% nakoupí – optimistický</label><input class="in" type="number" value="'+m.c+'" oninput="_m.c=+this.value||0;render()"></div>'
+  +'</div><div class="grid g3">'+scen+'</div>'
+  +'<div class="card" style="margin-top:16px;background:'+C.green+'12;border-color:'+C.green+'33;color:'+C.green+';font-size:14px">Verdikt: A ≥ 40k · B 15–40k · C 3–15k (jen na trase) · D 0–3k · NE pod nulou. Parametry z Nastavení. Pravidlo „beru jen A a B“ tě drží v bezpečí.</div>';
+}
+
+function viewSortiment(){
+ if(state.sub)return viewProduct();
+ var chips=["Vše"].concat(CATS).map(function(c){return '<button class="chip '+(state.cat===c?'on':'')+'" onclick="state.cat=\''+c+'\';render()">'+c+'</button>';}).join('');
+ var list=CATALOG.filter(function(p){return (state.cat==="Vše"||p.cat===state.cat)&&p.name.toLowerCase().indexOf(state.q.toLowerCase())>=0;});
+ var cards=list.map(function(p){var zisk=p.prodej-p.nakup;var pct=p.prodej?Math.round(zisk/p.prodej*100):0;
+  var img=p.img?'<img src="'+p.img+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:42px">'+CAT_EMOJI[p.cat]+'</span>';
+  return '<div class="card" style="padding:0;overflow:hidden"><button onclick="editProduct('+p.id+')" style="display:block;width:100%;text-align:left;border:none;background:none;cursor:pointer;padding:0"><div style="background:'+C.cream+';height:104px;display:grid;place-items:center;overflow:hidden">'+img+'</div><div style="padding:12px 12px 8px"><div style="display:flex;justify-content:space-between;align-items:center">'+pill(p.cat,C.greenLt)+'<span class="muted" style="font-size:11px">DPH '+p.dph+' %</span></div><div style="font-weight:700;margin-top:6px;font-size:14px">'+esc(p.name)+'</div><div style="border-top:1px solid '+C.line+';margin-top:8px;padding-top:8px;display:grid;grid-template-columns:repeat(3,1fr);text-align:center"><div><div class="muted" style="font-size:10px">nákup</div><div style="font-weight:600;font-size:14px">'+p.nakup+'</div></div><div><div class="muted" style="font-size:10px">prodej</div><div style="font-weight:600;font-size:14px">'+p.prodej+'</div></div><div><div class="muted" style="font-size:10px">zisk</div><div style="font-weight:700;font-size:14px;color:'+C.green+'">'+zisk+' Kč</div></div></div><div class="muted" style="font-size:11px;margin-top:8px;display:flex;justify-content:space-between"><span style="display:flex;align-items:center;gap:4px">'+ic("clock",11)+p.trvanlivost+' d</span><span>marže '+pct+' %</span></div></div></button><div style="border-top:1px solid '+C.line+';display:flex"><button class="muted" onclick="editProduct('+p.id+')" style="flex:1;padding:8px;font-size:12px;font-weight:600;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">'+ic("pencil",13)+'Upravit</button><button class="muted" onclick="dupProduct('+p.id+')" style="flex:1;padding:8px;font-size:12px;font-weight:600;background:none;border-left:1px solid '+C.line+';border-top:none;border-right:none;border-bottom:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">'+ic("copy",13)+'Duplikovat</button></div></div>';}).join('');
+ return '<div class="head"><div><h1>Sortiment</h1><div class="sub">Ceny a marže produktů — ekonomika nabídky</div></div><button class="btn" onclick="newProduct()">'+ic("plus",16)+'Přidat produkt</button></div>'
+  +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center"><div class="card" style="display:flex;align-items:center;gap:8px;padding:9px 12px;flex:1;min-width:180px">'+ic("search",16)+'<input style="border:none;outline:none;background:none;width:100%" placeholder="Hledat produkt…" value="'+esc(state.q)+'" oninput="state.q=this.value;render()"></div>'+chips+'</div>'
+  +'<div class="grid g3">'+cards+'</div>'+(list.length===0?'<div class="muted" style="text-align:center;margin-top:24px;font-size:14px">Nic nenalezeno.</div>':'');
+}
+function newProduct(){window._p={name:"",cat:"Jídlo",img:null,trvanlivost:5,nakup:0,prodej:0,dph:12};state.sub="new";render();}
+function editProduct(id){var p=CATALOG.filter(function(x){return x.id===id;})[0];window._p=JSON.parse(JSON.stringify(p));state.sub="edit";render();}
+function dupProduct(id){var p=CATALOG.filter(function(x){return x.id===id;})[0];var c=JSON.parse(JSON.stringify(p));c.id=Date.now();c.name=p.name+" (kopie)";CATALOG.push(c);save("catalog",CATALOG);toast("Zduplikováno");render();}
+function viewProduct(){
+ var p=window._p;var zisk=(p.prodej||0)-(p.nakup||0);var pct=p.prodej?Math.round(zisk/p.prodej*100):0;
+ var img=p.img?'<img src="'+p.img+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:60px">'+CAT_EMOJI[p.cat]+'</span>';
+ var catsel=CATS.map(function(c){return '<option '+(p.cat===c?'selected':'')+'>'+c+'</option>';}).join('');
+ return '<button class="link" onclick="state.sub=null;render()">← Zpět na sortiment</button><div class="head"><div><h1>'+(p.id?'Upravit produkt':'Nový produkt')+'</h1><div class="sub">Čistý zisk se spočítá sám</div></div></div>'
+  +'<div class="grid g2">'
+  +'<div class="card"><label>Obrázek produktu</label><div style="background:'+C.cream+';height:180px;border-radius:10px;display:grid;place-items:center;overflow:hidden;margin-bottom:12px" id="imgprev">'+img+'</div><input type="file" accept="image/*" id="imgfile" style="display:none" onchange="pickImg(this)"><div style="display:flex;gap:8px"><button class="btn" onclick="document.getElementById(\'imgfile\').click()">'+ic("image",15)+'Nahrát obrázek</button>'+(p.img?'<button class="btn ghost" onclick="_p.img=null;render()">Odebrat</button>':'')+'</div></div>'
+  +'<div style="display:flex;flex-direction:column;gap:12px">'
+  +'<div class="card"><label>Název produktu</label><input class="in" value="'+esc(p.name)+'" oninput="_p.name=this.value" style="margin-bottom:12px"><div class="grid g2"><div><label>Kategorie</label><select class="in" onchange="_p.cat=this.value;render()">'+catsel+'</select></div><div><label>DPH</label><select class="in" onchange="_p.dph=+this.value"><option value="12" '+(p.dph===12?'selected':'')+'>12 %</option><option value="21" '+(p.dph===21?'selected':'')+'>21 %</option></select></div></div></div>'
+  +'<div class="card"><div class="grid g2"><div><label>Nákupní cena (Kč)</label><input class="in bold" type="number" value="'+p.nakup+'" oninput="_p.nakup=+this.value||0;render()"></div><div><label>Prodejní cena (Kč)</label><input class="in bold" type="number" value="'+p.prodej+'" oninput="_p.prodej=+this.value||0;render()"></div></div><div style="background:'+C.green+'12;border-radius:10px;margin-top:12px;padding:12px;display:flex;justify-content:space-between;align-items:center"><span style="color:'+C.green+';font-weight:600;font-size:14px">Čistý zisk na kus</span><span style="color:'+C.green+';font-weight:800;font-size:20px">'+zisk+' Kč <span style="font-size:14px;font-weight:600">('+pct+' %)</span></span></div></div>'
+  +'<div class="card"><label>Trvanlivost (dní)</label><input class="in bold" type="number" value="'+p.trvanlivost+'" oninput="_p.trvanlivost=+this.value||0"><div class="muted" style="font-size:11px;margin-top:6px">Trvanlivost se primárně řídí v Selfly Store; tady slouží pro tvé ekonomické přehledy.</div></div>'
+  +'</div></div>'
+  +'<div style="display:flex;gap:8px;margin-top:16px"><button class="btn" onclick="saveProduct()">'+ic("check",16)+'Uložit produkt</button><button class="btn ghost" onclick="state.sub=null;render()">Zrušit</button>'+(p.id?'<button class="btn danger" style="margin-left:auto" onclick="delProduct()">'+ic("trash",15)+'Smazat</button>':'')+'</div>';
+}
+function pickImg(input){var f=input.files[0];if(!f)return;var r=new FileReader();r.onload=function(){window._p.img=r.result;render();};r.readAsDataURL(f);}
+function saveProduct(){var p=window._p;if(!p.name){toast("Vyplň název");return;}if(p.id){CATALOG=CATALOG.map(function(x){return x.id===p.id?p:x;});}else{p.id=Date.now();CATALOG.push(p);}save("catalog",CATALOG);state.sub=null;toast("Uloženo");render();}
+function delProduct(){CATALOG=CATALOG.filter(function(x){return x.id!==window._p.id;});save("catalog",CATALOG);state.sub=null;toast("Smazáno");render();}
+
+function viewNastaveni(){
+ function fld(label,k,step,suffix,pct){return '<div class="card"><label>'+label+'</label><div style="display:flex;align-items:center;gap:8px"><input class="in" style="font-size:18px;font-weight:700" type="number" step="'+(step||1)+'" value="'+(pct?Math.round(S[k]*100):S[k])+'" oninput="setS(\''+k+'\',this.value,'+(pct?'true':'false')+')"><span class="muted">'+suffix+'</span></div></div>';}
+ return '<div class="head"><div><h1>Nastavení</h1><div class="sub">Globální parametry — propíšou se do zisku, break-even i rozhodování</div></div></div>'
+  +'<div class="grid g3">'+fld("Marže na položku","marze",1,"Kč")+fld("Položek na nákup","polozekNakup",0.1,"ks")+fld("Plýtvání","plytvani",1,"%",true)+fld("Poplatek od firmy / měs","poplatek",500,"Kč")+fld("Fixní náklady / měs","fix",500,"Kč")+fld("Ostatní náklady / měs","ostatni",500,"Kč")+fld("Daň z příjmu","dan",1,"%",true)+fld("Prodejní dny / měs","dny",1,"dní")+'</div>'
+  +'<div class="card" style="margin-top:16px;background:'+C.blue+'12;border-color:'+C.blue+'33;color:'+C.blue+';font-size:14px;display:flex;gap:8px;align-items:flex-start">'+ic("refresh",18)+'<span>Prodeje, zásoby a expirace se tahají ze Selfly Store. Tato appka je ekonomický velín: počítá zisk, break-even a pomáhá rozhodovat o místech a trasách.</span></div>'
+  +'<div style="margin-top:16px"><button class="btn ghost" onclick="resetAll()">Obnovit ukázková data</button></div>';
+}
+function setS(k,val,pct){S[k]=pct?(parseFloat(val)||0)/100:(parseFloat(val)||0);save("settings",S);render();}
+function resetAll(){if(!confirm("Obnovit vše na ukázková data? Smaže tvé změny."))return;localStorage.removeItem("biteo_settings");localStorage.removeItem("biteo_catalog");localStorage.removeItem("biteo_fridges");S=JSON.parse(JSON.stringify(DEFAULT_SETTINGS));CATALOG=JSON.parse(JSON.stringify(DEFAULT_CATALOG));FRIDGES=JSON.parse(JSON.stringify(DEFAULT_FRIDGES));toast("Obnoveno");render();}
+
+/* ================= render ================= */
+function render(){
+ var al=alerts();var restock=new Set(al.map(function(a){return a.fid;})).size;
+ // sidebar
+ var sb='<div class="logo"><div class="b">B</div><div><div class="t">Biteo</div><div class="s">ekonomický velín</div></div></div>';
+ NAV.forEach(function(n){var badge=(n.id==="trasy"&&restock)?'<span class="badge">'+restock+'</span>':'';sb+='<button class="navbtn '+(state.tab===n.id?'on':'')+'" onclick="go(\''+n.id+'\')">'+ic(n.icon)+'<span style="flex:1">'+n.label+'</span>'+badge+'</button>';});
+ sb+='<div class="foot">Prototyp · data ze Selfly (mock)</div>';
+ document.getElementById("sidebar").innerHTML=sb;
+ // bottom nav
+ var bn='';NAV.forEach(function(n){var badge=(n.id==="trasy"&&restock)?'<span class="badge">'+restock+'</span>':'';bn+='<button class="'+(state.tab===n.id?'on':'')+'" onclick="go(\''+n.id+'\')"><div style="position:relative">'+ic(n.icon)+badge+'</div><span>'+n.label+'</span></button>';});
+ document.getElementById("bottomnav").innerHTML=bn;
+ // main
+ var v="";
+ if(state.tab==="prehled")v=viewPrehled();
+ else if(state.tab==="lednice")v=state.sel?viewDetail():viewLednice();
+ else if(state.tab==="trasy")v=viewTrasy();
+ else if(state.tab==="misto")v=viewMisto();
+ else if(state.tab==="sortiment")v=viewSortiment();
+ else if(state.tab==="nastaveni")v=viewNastaveni();
+ document.getElementById("main").innerHTML=v;
+}
+render();
+</script>
+</body>
+</html>
